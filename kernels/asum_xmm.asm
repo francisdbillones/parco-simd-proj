@@ -1,6 +1,6 @@
 section .data
     align 16
-    absmask dq 0x7FFFFFFFFFFFFFFF, 0x7FFFFFFFFFFFFFFF
+    absmask dq 0x7FFFFFFFFFFFFFFF, 0x7FFFFFFFFFFFFFFF ; 
 
 section .text
 bits 64
@@ -8,25 +8,41 @@ default rel
 global asum_xmm
 asum_xmm:
 
-    lea rax, [rcx]              ; pointer to array 
-    mov rdx, rdx                
-    xor rcx, rcx               
+    lea rax, [rcx]              
+    mov r8, rdx                 ; N to r8
+    xor rcx, rcx                
 
-    vxorpd xmm0, xmm0, xmm0     
-    vmovdqa xmm2, [absmask]     ; load bitmask
+    vxorpd xmm0, xmm0, xmm0     ; clear xmm0 for sum
+    vmovdqa xmm2, [absmask]     ; load absmask
 
-.LOOP:
+.LOOP: ; sum of absolute value
+    
+    mov r9, rcx                 
+    add r9, 1                   ; r9 = i + 1
+    cmp r9, r8                  ; check i and i+1 < n
+    jge .LEFTOVER               ; if r9 >= r8, jump to leftover
 
-    vmovupd xmm1, [rax + 8*rcx] ; load 2 doubles 
+    vmovupd xmm1, [rax + 8*rcx] 
+    vandpd xmm1, xmm1, xmm2     ; absolute value using mask
 
-    vandpd xmm1, xmm1, xmm2     ; 
     vaddpd xmm0, xmm0, xmm1     ; xmm0 += xmm1
 
     add rcx, 2
-    cmp rcx, rdx
-    jl .LOOP
+    jmp .LOOP
 
-    vpermilpd xmm1, xmm0, 1
-    vaddsd xmm0, xmm0, xmm1
+.LEFTOVER: ; for boundary case when n is odd
+
+    cmp rcx, r8                 ; check if there is leftover element i < n
+    jge .DONE                   ; if rcx >= r8 it means array is even then jump to done
+
+    vmovsd xmm1, [rax + 8*rcx]  ; copy leftover element to xmm1 
+    vandpd xmm1, xmm1, xmm2     
+
+    vaddsd xmm0, xmm0, xmm1     ; xmm0 += xmm1 (leftover element)
+
+.DONE:
+
+    vpermilpd xmm1, xmm0, 1     ; swap high and low bit
+    vaddsd xmm0, xmm0, xmm1     ; add high half to low half
 
     ret
