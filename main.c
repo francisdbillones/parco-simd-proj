@@ -35,7 +35,7 @@ static double* make_vector(size_t n) {
 	double* A = (double*)malloc((n + PAD) * sizeof(double));
 	if (!A) return NULL;
 	for (size_t i = 0; i < n; i++)
-		A[i] = (double) i;
+		A[i] = (double)((int)(i % 1000) - 500);
 	for (size_t i = n; i < n + PAD; i++)
 		A[i] = POISON;
 	return A;
