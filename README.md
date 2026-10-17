@@ -74,5 +74,8 @@ As an alternative we picked `A[i] = (i % 1000) - 500`, which means every value i
 
 **2. Unrolling also only helps with no memory bottleneck** Each `vaddpd` must wait ~4 cycles for the previous one when there is a single accumulator. We added unrolling in the hopes that it would be a significant speedup, but as we saw earlier, YMM at just one accumulator is already bottlenecked by memory when we are processing n=2^26 and n=2^30 elements.
 
+**3. Handling odd array sizes in XMM**
+Since 128-bit XMM registers process 2 `double`s at a time, odd array sizes leave 1 leftover element. We handled this boundary by stopping the main vector loop early at N - 1 to look ahead and avoid reading past the array end. If there was a leftover element, we moved it into a register by itself (`.LEFTOVER`), applied our absolute value mask, and added it using scalar instructions (`vaddsd`) before combining the final total.
+
 
 ## Conclusion
