@@ -69,6 +69,35 @@ In Release, C and our hand-written x86-64 kernel are within 2% of each other at 
 
 According to Microsoft's official [documentation](https://learn.microsoft.com/en-us/cpp/error-messages/tool-errors/vectorizer-and-parallelizer-messages), `cl` has `/fp:precise` by default, which does not allow reordering floating-point additions, so it cannot vectorize the loop. Thus, the generated machine code only uses scalar instructions and should be very similar to our hand-written x86-64 code. The 0.99x geometric mean also shows that they perform exactly the same.
 
+### Is ASUM memory-bound or compute-bound?
+
+It depends on the kernel and on where the data lives.
+
+Consider the following table:
+
+#### Table 3: Effective bandwidth
+
+| N | C | x86-64 | XMM | YMM | YMM Unrolled |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| 2^20 | 6.2 GB/s | 6.2 GB/s | 11.1 GB/s | 17.7 GB/s | 21.8 GB/s |
+| 2^26 | 6.3 GB/s | 6.2 GB/s | 9.6 GB/s | 11.4 GB/s | 11.5 GB/s |
+| 2^30 | 6.2 GB/s | 6.1 GB/s | 9.4 GB/s | 11.2 GB/s | 11.3 GB/s |
+
+*Values computed from the Release times as n * 8 bytes / time.*
+
+- **Scalar kernels (C, x86-64)** are compute-bound at every size, fixed at ~6.2 GB/s.
+- **SIMD, n=2^20**
+
+At this size, the vector only takes up 8 MiB. This fits in our CPU's L3 cache, as mentioned in [Benchmark Setup](#benchmark-setup). Thus, the SIMD kernels are mostly compute-bound. We can see that stepping up width increases throughput: XMM 11.1 GB/s, YMM 17.7 GB/s, YMM Unrolled 21.8 GB/s.
+
+- **SIMD, n=2^26, 2^30** 
+
+At this size, the vector takes up 512 MiB and 8 GiB respectively. This means that the kernels have to read from DRAM.
+
+We can see that the YMM kernels flatten at ~11.4 GB/s, and unrolling gains only 1%. This shows the memory latency bottleneck: no matter how fast the kernel can add, it cannot receive data faster than that. XMM (~9.5 GB/s) is a tad slower, but the slowdown is not as great as in 2^20 because compute throughput is less significant here.
+
+In general, ASUM does very little work per byte: one AND and one add for every 8-byte element it loads. Once the computation is vectorized, the CPU can process data faster than memory can deliver it, so for large vectors ASUM is memory-bound.
+
 ## Problems Encountered and AHA Moments
 
 ### Problems
