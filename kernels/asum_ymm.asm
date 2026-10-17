@@ -12,51 +12,23 @@ asum_ymm:
     mov r8d, ecx                ; N (1st arg, zero-extended) to r8
     xor rcx, rcx
 
-    vxorpd ymm0, ymm0, ymm0
-    vxorpd ymm3, ymm3, ymm3
-    vxorpd ymm4, ymm4, ymm4
-    vxorpd ymm5, ymm5, ymm5
+    vxorpd ymm0, ymm0, ymm0     ; clear ymm0 for sum
     vmovdqa ymm2, [absmask]     ; load absmask
-
-    mov r9, r8
-    sub r9, 15                  ; r9 = n - 15
-
-.LOOP16: ; we have lots of ymm registers go brrrrrrrr
-
-    cmp rcx, r9                 ; check i to i+15 < n
-    jge .COMBINE                ; if rcx >= r9, jump to combine
-
-    vandpd ymm1, ymm2, [rax + 8*rcx]      ; absolute value using mask
-    vaddpd ymm0, ymm0, ymm1
-    vandpd ymm1, ymm2, [rax + 8*rcx + 32]
-    vaddpd ymm3, ymm3, ymm1
-    vandpd ymm1, ymm2, [rax + 8*rcx + 64]
-    vaddpd ymm4, ymm4, ymm1
-    vandpd ymm1, ymm2, [rax + 8*rcx + 96]
-    vaddpd ymm5, ymm5, ymm1
-
-    add rcx, 16
-    jmp .LOOP16
-
-.COMBINE: ; sum the 4 accumulators into ymm0
-
-    vaddpd ymm0, ymm0, ymm3
-    vaddpd ymm4, ymm4, ymm5
-    vaddpd ymm0, ymm0, ymm4
 
     mov r9, r8
     sub r9, 3                   ; r9 = n - 3
 
-.LOOP4: ; remaining blocks of 4
+.LOOP: ; sum of absolute value
 
     cmp rcx, r9                 ; check i to i+3 < n
     jge .REDUCE                 ; if rcx >= r9, jump to reduce
 
-    vandpd ymm1, ymm2, [rax + 8*rcx]      ; absolute value using mask
-    vaddpd ymm0, ymm0, ymm1
+    vandpd ymm1, ymm2, [rax + 8*rcx] ; absolute value using mask
+
+    vaddpd ymm0, ymm0, ymm1     ; ymm0 += ymm1
 
     add rcx, 4
-    jmp .LOOP4
+    jmp .LOOP
 
 .REDUCE: ; horizontal sum of ymm0 into the low element of xmm0
 
@@ -65,7 +37,7 @@ asum_ymm:
     vpermilpd xmm1, xmm0, 1     ; swap high and low
     vaddsd xmm0, xmm0, xmm1
 
-.LEFTOVER:
+.LEFTOVER: ; for boundary case of up to 3 remaining elements
 
     cmp rcx, r8                 ; check if there is leftover element i < n
     jge .DONE

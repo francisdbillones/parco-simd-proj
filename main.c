@@ -14,15 +14,17 @@ double asum(const int n, const double* A);
 double asum_x64(const int n, const double* A);
 double asum_xmm(const int n, const double* A);
 double asum_ymm(const int n, const double* A);
+double asum_ymm_unrolled(const int n, const double* A);
 
 typedef double (*kernel_fn)(const int, const double*);
 typedef struct { const char* name; kernel_fn fn; } Kernel;
 
 static const Kernel kernels[] = {
-	{ "C",      asum     },
-	//{ "x86-64", asum_x64 },
-	{ "XMM",    asum_xmm },
-	{ "YMM",    asum_ymm },
+	{ "C",            asum              },
+	//{ "x86-64",       asum_x64          },
+	{ "XMM",          asum_xmm          },
+	{ "YMM",          asum_ymm          },
+	{ "YMM_unrolled", asum_ymm_unrolled },
 };
 #define N_KERNEL (int)(sizeof kernels / sizeof kernels[0])
 
@@ -47,7 +49,9 @@ static int test_boundary_situations(void) {
 	const int sizes[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 15, 17, 1003, 1021, 4099 };
 	int all_ok = 1;
 	printf("\n=== Test boundary situations (kernel vs C) ===\n");
-	printf("%6s | %-6s %-6s %-6s\n", "n", "x86-64", "XMM", "YMM");
+	printf("%6s |", "n");
+	for (int k = 1; k < N_KERNEL; k++) printf(" %-12s", kernels[k].name);
+	printf("\n");
 	for (int s = 0; s < (int)(sizeof sizes / sizeof sizes[0]); s++) {
 		int n = sizes[s];
 		double* A = make_vector(n);
@@ -57,7 +61,7 @@ static int test_boundary_situations(void) {
 		for (int k = 1; k < N_KERNEL; k++) {
 			int ok = kernels[k].fn(n, A) == ref;
 			all_ok &= ok;
-			printf(" %-6s", ok ? "OK" : "FAIL");
+			printf(" %-12s", ok ? "OK" : "FAIL");
 		}
 		printf("\n");
 		free(A);
@@ -67,7 +71,7 @@ static int test_boundary_situations(void) {
 
 static int test_normal(void) {
 	const int exps[] = { 20, 26, 30 };
-	double avg[3][4] = { 0 };
+	double avg[3][N_KERNEL] = { 0 };
 	int used_exp[3];
 	int all_ok = 1;
 
@@ -98,7 +102,7 @@ static int test_normal(void) {
 			avg[e][k] = total / N_RUNS;
 			int ok = result == ref;
 			all_ok &= ok;
-			printf("%-7s asum = %.10f  avg time = %10.4f ms  [%s]\n",
+			printf("%-12s asum =%.10f  avg time = %10.4f ms  [%s]\n",
 			       kernels[k].name, result, avg[e][k], ok ? "CORRECT" : "WRONG");
 		}
 		free(A);
