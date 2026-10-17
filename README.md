@@ -5,6 +5,7 @@
 | Machine | Google Cloud `c2-standard-4` |
 | OS | Windows Server 2025 Datacenter |
 | CPU | Intel Xeon @ 3.10 GHz (Cascade Lake), 4 vCPUs |
+| Cache | L2: 2 MB, L3: 24.75 MB (shared) |
 | RAM | 16 GB |
 | Vector init | `A[i] = (i % 1000) - 500` |
 
