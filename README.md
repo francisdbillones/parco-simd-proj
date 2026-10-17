@@ -56,6 +56,13 @@ To test that the boundaries are correctly respected, aside from comparing agains
 | 2^30 | 1376.5 ms | 1398.5 ms (0.98x) | 911.7 ms (1.51x) | 769.5 ms (1.79x) | 760.3 ms (1.81x) |
 | **Geo. mean** | - | 0.99x | 1.60x | 2.10x | 2.26x |
 
+### Which kernel is fastest?
+
+YMM Unrolled is the fastest kernel at every size, followed by YMM, XMM, and then C and x86-64, which are tied. Against Release C, it is 3.49x faster at 2^20 but plateaus to only about 1.8x faster at 2^26 and 2^30. 
+
+
+The plain YMM also follows the same pattern; it is 2.83x faster at 2^20, but falls down to 1.8x at the larger sizes.
+
 ## Problems Encountered and AHA Moments
 
 ### Problems
