@@ -1,4 +1,4 @@
-section .data
+section .data align=16
     align 16
     absmask dq 0x7FFFFFFFFFFFFFFF, 0x7FFFFFFFFFFFFFFF ; 
 
