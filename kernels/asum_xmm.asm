@@ -8,8 +8,8 @@ default rel
 global asum_xmm
 asum_xmm:
 
-    lea rax, [rcx]              
-    mov r8, rdx                 ; N to r8
+    mov rax, rdx                ; array pointer (2nd arg)
+    mov r8d, ecx                ; N (1st arg, zero-extended) to r8
     xor rcx, rcx                
 
     vxorpd xmm0, xmm0, xmm0     ; clear xmm0 for sum
