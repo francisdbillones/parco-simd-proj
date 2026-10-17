@@ -52,4 +52,11 @@ As an alternative we picked `A[i] = (i % 1000) - 500`, which means every value i
 
 **3. XMM kernel crashed on the benchmark machine but not on the personal laptop.** The mask is loaded with `vmodqa` which assumes 16-byte alignment. The mask already had `align 16`, but turns out NASM requires another `section .data align=16` to actually align the mask in memory.
 
+### AHA Moments
+
+**1. Wider registers only help if memory is not the bottleneck** At n=2^20, the array is 8 MiB and fits comfortably in the L2 cache (mentioned in [Benchmark Setup](#benchmark-setup). We can see that at this size, YMM is 1.6x faster than XMM, and unrolling the YMM into 4 independent accumulators gives another 1.23x speedup. At n=2^26 and n=2^30, however, data has to be read from DRAM, which is orders of magnitude slower than CPU cache. At this size, YMM is only 1.19x faster than XMM, and unrolling only gives another 1.01x speedup. The kernel is spending a lot more time waiting for memory compared to computing, so this is Amdahl's law in action.
+
+**2. Unrolling also only helps with no memory bottleneck** Each `vaddpd` must wait ~4 cycles for the previous one when there is a single accumulator. We added unrolling in the hopes that it would be a significant speedup, but as we saw earlier, YMM at just one accumulator is already bottlenecked by memory when we are processing n=2^26 and n=2^30 elements.
+
+
 ## Conclusion
