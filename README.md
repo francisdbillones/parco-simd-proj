@@ -145,3 +145,17 @@ Since 128-bit XMM registers process 2 `double`s at a time, odd array sizes leave
 
 
 ## Conclusion
+
+All four required kernels (C, x86-64, SIMD XMM, SIMD YMM) and our extra unrolled YMM kernel produce the same result as the C answer key at every size, and pass the boundary check for sizes that don't fit evenly into a register.
+
+**Is ASUM memory-bound or compute-bound?** 
+
+
+- Small N - compute-bound
+- Large N - memory-bound
+
+For small vectors that fit in cache, it is compute-bound, and wider registers and more accumulators each make it faster. For large vectors that must be read from DRAM, the SIMD kernels are memory-bound. ASUM does only one AND and one add per 8 bytes loaded, so once it is vectorized, the CPU finishes the work faster than memory can supply the data.
+
+**Will SIMD YMM be faster than optimized C?**
+
+Yes. Since `cl` does not vectorize the floating-point sum on its own, the Release C kernel runs at the same speed as our scalar x86-64 kernel, and YMM beats it by 2.83x at 2^20 and about 1.8x at 2^26 and 2^30. But the speedup is far from the theoretical 4x, and it shrinks as the vector grows: past the size of the cache, a wider register can't make memory deliver data any faster.
