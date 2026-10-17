@@ -1,7 +1,6 @@
 <Solution>
   <Configurations>
     <Platform Name="x64" />
-    <Platform Name="x86" />
   </Configurations>
   <Project Path="parco project.vcxproj" Id="889b2cd4-3a3c-47f6-a089-a4d5eb307336" />
 </Solution>
