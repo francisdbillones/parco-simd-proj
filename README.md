@@ -8,6 +8,11 @@ It is implemented in C, non-SIMD x86-64 assembly, and x86 SIMD assembly using XM
 
 We also added an extra kernel for experimentation: unrolled YMM that uses 4 independent YMM registers.
 
+### Building in CLI
+
+Debug: `build_d.bat`, then `asum_d.exe`
+Release: `build_r.bat`, then `asum_r.exe`
+
 ## Benchmark Setup
 
 | | |
