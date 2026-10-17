@@ -1,3 +1,11 @@
+# ASUM: Sum of Absolute Values
+
+ASUM computes the sum of the absolute values of a vector of `n` double-precision floats:
+
+$$\text{asum} = \sum_{i=0}^{n-1} |A_i|$$
+
+It is implemented in C, non-SIMD x86-64 assembly, and x86 SIMD assembly using XMM (128-bit) and YMM (256-bit) registers.
+
 ## Benchmark Setup
 
 | | |
