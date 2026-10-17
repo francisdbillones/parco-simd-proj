@@ -11,7 +11,7 @@ static double now_ms(void) {
 
 
 double asum(const int n, const double* A);
-double asum_x64(const int n, const double* A);
+double asum_asm(const int n, const double* A);
 double asum_xmm(const int n, const double* A);
 double asum_ymm(const int n, const double* A);
 double asum_ymm_unrolled(const int n, const double* A);
@@ -21,7 +21,7 @@ typedef struct { const char* name; kernel_fn fn; } Kernel;
 
 static const Kernel kernels[] = {
 	{ "C",            asum              },
-	//{ "x86-64",       asum_x64          },
+	{ "x86-64",       asum_asm          },
 	{ "XMM",          asum_xmm          },
 	{ "YMM",          asum_ymm          },
 	{ "YMM_unrolled", asum_ymm_unrolled },

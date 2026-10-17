@@ -5,4 +5,4 @@ nasm -f win64 kernels\asum_xmm.asm -o objs\asum_xmm.obj
 nasm -f win64 kernels\asum_ymm.asm -o objs\asum_ymm.obj
 nasm -f win64 kernels\asum_ymm_unrolled.asm -o objs\asum_ymm_unrolled.obj
 cl /Od /c kernels\asum.c /Foobjs\asum.obj
-cl /Od main.c objs\asum.obj objs\asum_xmm.obj objs\asum_ymm.obj objs\asum_ymm_unrolled.obj /Foobjs\main.obj /Feasum_d.exe
+cl /Od main.c objs\asum.obj objs\asum_asm.obj objs\asum_xmm.obj objs\asum_ymm.obj objs\asum_ymm_unrolled.obj /Foobjs\main.obj /Feasum_d.exe
