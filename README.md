@@ -4,7 +4,7 @@
 
 ## Analysis
 
-| Kernel Version | Machine F Time (ns) | Machine R Time (ns) | Machine F Speedup | Machine R Speedup |
+| Kernel Version | Machine F Time (ms) | Machine R Time (ms) | Machine F Speedup | Machine R Speedup |
 | :--- | :---: | :---: | :---: | :---: |
 | **C** | -- | -- | :---: | :---: |
 | **x86-64 Non-SIMD** | -- | -- | -- | -- |
