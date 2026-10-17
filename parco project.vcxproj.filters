@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Downloads\asum.c">
+    <ClCompile Include="Include="kernels\asum.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.c">
