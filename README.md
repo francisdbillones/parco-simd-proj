@@ -10,6 +10,14 @@
 
 ## Program Output
 
+### Release
+
+![Release output](screenshots/release.png)
+
+### Debug
+
+![Debug output](screenshots/debug.png)
+
 ## Analysis
 
 #### Table 1: Release build
