@@ -98,6 +98,14 @@ We can see that the YMM kernels flatten at ~11.4 GB/s, and unrolling gains only 
 
 In general, ASUM does very little work per byte: one AND and one add for every 8-byte element it loads. Once the computation is vectorized, the CPU can process data faster than memory can deliver it, so for large vectors ASUM is memory-bound.
 
+### Why the speedup is far below the theoretical 4x
+
+A 256-bit YMM register holds 4 doubles, so in theory YMM should be 4x faster than scalar code. That would only hold if the speed of the adds was the only limit.
+
+As shown in [the previous section](#is-asum-memory-bound-or-compute-bound), at 2^26 and 2^30 the SIMD kernels are memory-bound: they plateau at ~11.4 GB/s no matter how fast they can add, so YMM only reaches ~1.8x over C.
+
+At 2^20 the data comes from L3, so the kernels can go faster, and YMM Unrolled reaches 3.49x. Plain YMM falls short of that (2.83x) because its single accumulator still waits ~4 cycles between adds.
+
 ## Problems Encountered and AHA Moments
 
 ### Problems
