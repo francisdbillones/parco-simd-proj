@@ -8,6 +8,7 @@
 | Cache | L2: 2 MB, L3: 24.75 MB (shared) |
 | RAM | 16 GB |
 | Vector init | `A[i] = (i % 1000) - 500` |
+| # of runs | 30 |
 
 ## Program Output
 
