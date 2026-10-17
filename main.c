@@ -22,7 +22,7 @@ static const Kernel kernels[] = {
 	{ "C",      asum     },
 	//{ "x86-64", asum_x64 },
 	{ "XMM",    asum_xmm },
-	//{ "YMM",    asum_ymm },
+	{ "YMM",    asum_ymm },
 };
 #define N_KERNEL (int)(sizeof kernels / sizeof kernels[0])
 
