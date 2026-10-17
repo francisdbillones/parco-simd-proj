@@ -106,6 +106,10 @@ As shown in [the previous section](#is-asum-memory-bound-or-compute-bound), at 2
 
 At 2^20 the data comes from L3, so the kernels can go faster, and YMM Unrolled reaches 3.49x. Plain YMM falls short of that (2.83x) because its single accumulator still waits ~4 cycles between adds.
 
+### Debug vs. Release
+
+Build mode should only affect the C kernel. The assembly kernels are assembled the same way in both builds, and their values agree within ~1% at 2^26 and 2^30. Debug C is about 2x slower than Release C because it keeps `sum` and `i` in memory instead of registers, adding an unnecessary store and reload to every iteration. This makes every speedup in the Debug table about twice as large as in Release. The Release table is the fair comparison against optimized C.
+
 ## Problems Encountered and AHA Moments
 
 ### Problems
