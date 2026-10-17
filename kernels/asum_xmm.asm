@@ -15,14 +15,15 @@ asum_xmm:
     vxorpd xmm0, xmm0, xmm0     ; clear xmm0 for sum
     vmovdqa xmm2, [absmask]     ; load absmask
 
-.LOOP: ; sum of absolute value
-    
-    mov r9, rcx                 
-    add r9, 1                   ; r9 = i + 1
-    cmp r9, r8                  ; check i and i+1 < n
-    jge .LEFTOVER               ; if r9 >= r8, jump to leftover
+    mov r9, r8
+    sub r9, 1                   ; r9 = n - 1
 
-    vmovupd xmm1, [rax + 8*rcx] 
+.LOOP: ; sum of absolute value
+
+    cmp rcx, r9                 ; check i and i+1 < n
+    jge .LEFTOVER               ; if rcx >= r9, jump to leftover
+
+    vmovupd xmm1, [rax + 8*rcx]
     vandpd xmm1, xmm1, xmm2     ; absolute value using mask
 
     vaddpd xmm0, xmm0, xmm1     ; xmm0 += xmm1
