@@ -20,6 +20,12 @@
 
 ![Debug output](screenshots/debug.png)
 
+## Boundary Handling
+
+Each SIMD loop processes full registers while `i + width - 1 < n`; the remaining elements (at most 1 for XMM, 3 for YMM) are added one at a time with a scalar load. The unrolled YMM kernel processes 16 elements per iteration, then falls back to 4-wide blocks, then finally back to one at a time.
+
+To test that the boundaries are correctly respected, aside from comparing against the C answer, we also added 8 extra elements to the end of every vector with the value `1e300`. This means that if the kernel goes beyond the boundary, its answer will immediately blow up to `1e300` and we can easily spot the error.
+
 ## Analysis
 
 #### Table 1: Release build
