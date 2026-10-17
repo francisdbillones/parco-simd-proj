@@ -126,8 +126,7 @@ As an alternative we picked `A[i] = (i % 1000) - 500`, which means every value i
 
 **1. Wider registers only help if memory is not the bottleneck**
 
-
-At n=2^20, the array is 8 MiB and fits comfortably in the L3 cache (mentioned in [Benchmark Setup](#benchmark-setup)). We can see that at this size, YMM is 1.6x faster than XMM, and unrolling the YMM into 4 independent accumulators gives another 1.23x speedup. At n=2^26 and n=2^30, however, data has to be read from DRAM, which is orders of magnitude slower than CPU cache. At this size, YMM is only 1.19x faster than XMM, and unrolling only gives another 1.01x speedup. The kernel is spending a lot more time waiting for memory compared to computing, so this is Amdahl's law in action.
+We expected YMM to be close to 4x faster than C. At 2^26 and 2^30 it was only ~1.8x, because the kernels were waiting on memory, not on the adds (see [Is ASUM memory-bound or compute-bound?](#is-asum-memory-bound-or-compute-bound)).
 
 **2. Unrolling also only helps with no memory bottleneck**
 
