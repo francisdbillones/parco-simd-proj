@@ -63,6 +63,12 @@ YMM Unrolled is the fastest kernel at every size, followed by YMM, XMM, and then
 
 The plain YMM also follows the same pattern; it is 2.83x faster at 2^20, but falls down to 1.8x at the larger sizes.
 
+### C vs. x86-64
+
+In Release, C and our hand-written x86-64 kernel are within 2% of each other at every size. 
+
+According to Microsoft's official [documentation](https://learn.microsoft.com/en-us/cpp/error-messages/tool-errors/vectorizer-and-parallelizer-messages), `cl` has `/fp:precise` by default, which does not allow reordering floating-point additions, so it cannot vectorize the loop. Thus, the generated machine code only uses scalar instructions and should be very similar to our hand-written x86-64 code. The 0.99x geometric mean also shows that they perform exactly the same.
+
 ## Problems Encountered and AHA Moments
 
 ### Problems
