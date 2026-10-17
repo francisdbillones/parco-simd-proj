@@ -90,12 +90,12 @@ Consider the following table:
 
 *Values computed from the Release times as n * 8 bytes / time.*
 
-- **Scalar kernels (C, x86-64)** are compute-bound at every size, fixed at ~6.2 GB/s.
-- **SIMD, n=2^20**
+1. **Scalar kernels (C, x86-64)** are compute-bound at every size, fixed at ~6.2 GB/s.
+2. **SIMD, n=2^20** - compute bound
 
 At this size, the vector only takes up 8 MiB. This fits in our CPU's L3 cache, as mentioned in [Benchmark Setup](#benchmark-setup). Thus, the SIMD kernels are mostly compute-bound. We can see that stepping up width increases throughput: XMM 11.1 GB/s, YMM 17.7 GB/s, YMM Unrolled 21.8 GB/s.
 
-- **SIMD, n=2^26, 2^30** 
+3. **SIMD, n=2^26, 2^30** - memory bound
 
 At this size, the vector takes up 512 MiB and 8 GiB respectively. This means that the kernels have to read from DRAM.
 
