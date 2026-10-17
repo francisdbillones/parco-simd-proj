@@ -23,8 +23,7 @@ asum_xmm:
     cmp rcx, r9                 ; check i and i+1 < n
     jge .LEFTOVER               ; if rcx >= r9, jump to leftover
 
-    vmovupd xmm1, [rax + 8*rcx]
-    vandpd xmm1, xmm1, xmm2     ; absolute value using mask
+    vandpd xmm1, xmm2, [rax + 8*rcx] ; absolute value using mask
 
     vaddpd xmm0, xmm0, xmm1     ; xmm0 += xmm1
 
