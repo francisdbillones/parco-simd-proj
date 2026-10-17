@@ -40,5 +40,16 @@
 | 2^30 | 2717.9 ms | 1394.4 ms (1.95x) | 904.0 ms (3.01x) | 760.3 ms (3.57x) | 752.0 ms (3.61x) |
 | **Geo. mean** | - | 1.97x | 3.28x | 4.28x | 4.69x |
 
+## Problems Encountered and AHA Moments
+
+### Problems
+
+**1. Unreliable timings on a laptop.** The first few times we ran the full benchmark were on a laptop with other applications open. The assembly kernels are not affected by compiling in Debug or Release mode, yet their times differed by up to 25%. We hypothesized that this was because of background applications introducing noise, so we opted to benchmark in a cloud Windows Server machine, which runs significantly less background processes.
+
+**2. Correct kernels reported as WRONG at 2^30.** The very first init we used was `A[i] = i`, which is the same one we used in the in-person group exercises. At n = 2^30 however, the sum is about 5.8 * 10^17 which is greater than 2^53, the point at which doubles can no longer represent integers accurately. Also, there were no negative values to actually test the absolute value capabilities.
+
+As an alternative we picked `A[i] = (i % 1000) - 500`, which means every value is within the range `[-500, 500)`. The largest possible sum for this is below 2^53. 
+
+**3. XMM kernel crashed on the benchmark machine but not on the personal laptop.** The mask is loaded with `vmodqa` which assumes 16-byte alignment. The mask already had `align 16`, but turns out NASM requires another `section .data align=16` to actually align the mask in memory.
 
 ## Conclusion
